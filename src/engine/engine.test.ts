@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { coreItems, validityItems } from '../items/index';
 import { buildPhase1 } from './order';
 import { neighbors, scoreAll, scoreTypes } from './scoring';
-import { answer, back, newSession } from './session';
+import { answer, back, newSession, toggleFlag } from './session';
 import { makePersona, runPersona } from './simulate';
 import { checkValidity } from './validity';
 
@@ -72,6 +72,18 @@ describe('session', () => {
     s = answer(s, s.queue[0], 2, 3000);
     expect(s.answers[s.queue[0]]).toBe(2);
     expect(s.index).toBe(1);
+  });
+});
+
+describe('flags', () => {
+  it('toggles reasons and drops empty entries', () => {
+    let s = newSession(4);
+    s = toggleFlag(s, 'T1-fear-1', 'a');
+    s = toggleFlag(s, 'T1-fear-1', 'b');
+    expect(s.flags!['T1-fear-1']).toEqual(['a', 'b']);
+    s = toggleFlag(toggleFlag(s, 'T1-fear-1', 'a'), 'T1-fear-1', 'b');
+    expect(s.flags!['T1-fear-1']).toBeUndefined();
+    expect(answer(toggleFlag(s, 'x', 'a'), s.queue[0], 3, 2000).flags).toEqual({ x: ['a'] });
   });
 });
 

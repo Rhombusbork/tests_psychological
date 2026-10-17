@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { itemById } from '../../items/index';
 import { FC_LABELS, LIKERT_LABELS } from '../../items/schema';
-import { answer, back, expectedTotal, type Session } from '../../engine/session';
+import { answer, back, expectedTotal, FLAG_REASONS, toggleFlag, type Session } from '../../engine/session';
 
 interface Props { session: Session; onChange: (s: Session) => void; onDone: () => void; onExit: () => void }
 
@@ -13,10 +13,12 @@ export function Test({ session, onChange, onDone, onExit }: Props) {
   const item = id ? itemById.get(id) : undefined;
   const shownAt = useRef(performance.now());
   const [picked, setPicked] = useState<number | null>(null);
+  const [flagOpen, setFlagOpen] = useState(false);
 
   useEffect(() => {
     shownAt.current = performance.now();
     setPicked(null);
+    setFlagOpen(false);
   }, [id]);
 
   useEffect(() => {
@@ -41,6 +43,7 @@ export function Test({ session, onChange, onDone, onExit }: Props) {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (flagOpen) { if (e.key === 'Escape') setFlagOpen(false); return; }
       const n = Number(e.key);
       const max = item?.kind === 'fc' ? 4 : 5;
       if (n >= 1 && n <= max) choose(n);
@@ -48,13 +51,15 @@ export function Test({ session, onChange, onDone, onExit }: Props) {
     };
     addEventListener('keydown', onKey);
     return () => removeEventListener('keydown', onKey);
-  }, [choose, goBack, item]);
+  }, [choose, goBack, item, flagOpen]);
 
   if (!item) return null;
   const total = expectedTotal(session);
   const pct = Math.round((session.index / total) * 100);
   const prev = session.answers[item.id];
   const sel = picked ?? prev;
+  const myFlags = session.flags?.[item.id] ?? [];
+  const reasons = FLAG_REASONS.filter((r) => item.kind === 'fc' || !r.startsWith('선택지'));
 
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col px-4 py-6">
@@ -124,11 +129,31 @@ export function Test({ session, onChange, onDone, onExit }: Props) {
         )}
       </div>
 
-      <footer className="flex justify-between text-sm">
+      {flagOpen && (
+        <div className="mb-4 rounded-xl bg-white p-4 ring-1 ring-amber-300 dark:bg-stone-900 dark:ring-amber-700">
+          <p className="text-sm font-medium">이 문항의 어떤 점이 이상한가요? (여러 개 선택 가능)</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {reasons.map((r) => (
+              <button
+                key={r}
+                onClick={() => onChange(toggleFlag(session, item.id, r))}
+                className={`rounded-full px-3 py-1.5 text-xs ring-1 ${myFlags.includes(r) ? 'bg-amber-500 text-white ring-amber-500' : 'ring-stone-300 hover:bg-stone-100 dark:ring-stone-700 dark:hover:bg-stone-800'}`}
+              >
+                {r}
+              </button>
+            ))}
+          </div>
+          <button onClick={() => setFlagOpen(false)} className="mt-3 text-xs text-stone-500 hover:text-stone-800 dark:hover:text-stone-200">닫기 (Esc)</button>
+        </div>
+      )}
+
+      <footer className="flex items-center justify-between text-sm">
         <button onClick={goBack} disabled={session.index === 0} className="text-stone-500 hover:text-stone-800 disabled:opacity-30 dark:hover:text-stone-200">
           ← 이전
         </button>
-        <span className="text-stone-400">숫자 키로 응답</span>
+        <button onClick={() => setFlagOpen((v) => !v)} className={myFlags.length ? 'font-medium text-amber-600' : 'text-stone-400 hover:text-amber-600'}>
+          {myFlags.length ? `⚑ 표시됨 (${myFlags.length})` : '⚑ 이 문항 이상해요'}
+        </button>
       </footer>
     </main>
   );

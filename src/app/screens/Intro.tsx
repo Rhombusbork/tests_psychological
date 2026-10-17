@@ -31,6 +31,7 @@ export function Intro({ saved, onStart, onResume }: Props) {
           <li>너무 오래 고민하지 말고 처음 떠오르는 답을 고르세요.</li>
           <li>진행 상황은 이 브라우저에 자동 저장됩니다. 중간에 닫아도 이어서 할 수 있습니다.</li>
           <li>키보드: 숫자 키로 응답, Backspace로 이전 문항.</li>
+          <li>뜻이 모호하거나 답하기 어려운 문항은 아래 <b>⚑ 이 문항 이상해요</b>로 표시해 주세요. 결과 화면에서 모아서 복사할 수 있습니다.</li>
         </ul>
       </section>
 

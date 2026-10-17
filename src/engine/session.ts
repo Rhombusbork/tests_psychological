@@ -17,6 +17,18 @@ export interface Session {
   times: Record<string, number>;
   /** 2단계에서 문항마다 기록한 최대 사후확률 (정체 판정용) */
   trace: number[];
+  /** 사용자가 "이 문항 이상해요"로 표시한 문항과 이유 */
+  flags?: Record<string, string[]>;
+}
+
+export const FLAG_REASONS = ['뜻이 모호함', '상황에 따라 다름', '두 가지를 한꺼번에 물음', '누구나 그렇다고 할 것 같음', '솔직하게 답하기 불편함', '앞에서 본 것과 비슷함', '선택지가 둘 다 맞거나 둘 다 아님', '말투가 어색함'] as const;
+
+export function toggleFlag(s: Session, id: string, reason: string): Session {
+  const cur = s.flags?.[id] ?? [];
+  const next = cur.includes(reason) ? cur.filter((r) => r !== reason) : [...cur, reason];
+  const flags = { ...s.flags, [id]: next };
+  if (!next.length) delete flags[id];
+  return { ...s, flags };
 }
 
 const adaptivePool: AnyItem[] = [...coreItems, ...fcTypeItems].map((i) => itemById.get(i.id)!);

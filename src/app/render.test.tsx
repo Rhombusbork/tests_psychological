@@ -23,6 +23,13 @@ describe('screens render', () => {
     expect(html).toContain('응답 타당도');
   });
 
+  it('shows flagged items with reasons', () => {
+    const s = { ...runPersona(makePersona(1, 2), 2), flags: { 'T1-fear-1': ['뜻이 모호함'] } };
+    const html = renderToString(<Result session={s} onRestart={noop} />);
+    expect(html).toContain('표시한 문항 (1)');
+    expect(html).toContain('뜻이 모호함');
+  });
+
   it('result report for random responder shows caution', () => {
     const s = runPersona(makePersona(null, 9), 9);
     expect(renderToString(<Result session={s} onRestart={noop} />)).toContain('해석 주의');

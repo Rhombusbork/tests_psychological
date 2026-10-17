@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer } from 'recharts';
 import { CENTER_CONTENT, FACET_LABELS, INSTINCT_CONTENT, LEVEL_CONTENT, SUBTYPES } from '../../content/misc';
 import { TYPE_CONTENT } from '../../content/types';
@@ -7,6 +7,8 @@ import { scoreAll, TYPES } from '../../engine/scoring';
 import type { Session } from '../../engine/session';
 import { checkValidity } from '../../engine/validity';
 import { FACETS, type Center } from '../../items/schema';
+import { itemById } from '../../items/index';
+import { FC_LABELS, LIKERT_LABELS } from '../../items/schema';
 import { Bar, List, Pill, Section } from '../components/ui';
 
 export function Result({ session, onRestart }: { session: Session; onRestart: () => void }) {
@@ -180,6 +182,8 @@ export function Result({ session, onRestart }: { session: Session; onRestart: ()
         </table>
       </Section>
 
+      <FlaggedItems session={session} />
+
       <p className="px-2 text-xs leading-relaxed text-stone-500">
         이 결과는 자기이해를 위한 비공식 검사 결과이며 임상적 진단이 아닙니다. 에니어그램 유형은 검사만으로 확정되지 않습니다.
         결과 설명을 읽고 스스로 가장 깊이 공감되는 유형을 탐색해 보세요.
@@ -190,5 +194,47 @@ export function Result({ session, onRestart }: { session: Session; onRestart: ()
         <button onClick={() => confirm('결과가 삭제됩니다. 다시 검사할까요?') && onRestart()} className="rounded-xl px-6 py-3 font-semibold ring-1 ring-stone-300 hover:bg-stone-100 dark:ring-stone-700 dark:hover:bg-stone-900">다시 검사하기</button>
       </div>
     </main>
+  );
+}
+
+function flaggedText(session: Session): string {
+  return Object.entries(session.flags ?? {})
+    .map(([id, reasons]) => {
+      const i = itemById.get(id);
+      if (!i) return '';
+      const x = session.answers[id];
+      const text = i.kind === 'likert' ? i.text : `A: ${i.a.text} / B: ${i.b.text}`;
+      const ans = x === undefined ? '미응답' : i.kind === 'likert' ? LIKERT_LABELS[x - 1] : FC_LABELS[x - 1];
+      return `[${id}] ${text}\n  이유: ${reasons.join(', ')}\n  내 응답: ${ans}`;
+    })
+    .filter(Boolean)
+    .join('\n\n');
+}
+
+function FlaggedItems({ session }: { session: Session }) {
+  const entries = Object.keys(session.flags ?? {});
+  const [copied, setCopied] = useState(false);
+  if (!entries.length) return null;
+  const text = `에니어그램 검사 문항 피드백 (문항 은행 ${session.version}, ${entries.length}개)\n\n${flaggedText(session)}`;
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+    }
+    setCopied(true);
+  };
+  return (
+    <Section title={`표시한 문항 (${entries.length})`}>
+      <pre className="max-h-80 overflow-auto whitespace-pre-wrap rounded-xl bg-stone-50 p-4 text-xs leading-relaxed dark:bg-stone-800">{flaggedText(session)}</pre>
+      <button onClick={copy} className="no-print mt-3 rounded-xl bg-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-600">
+        {copied ? '복사됨 ✓' : '피드백 전체 복사'}
+      </button>
+    </Section>
   );
 }
