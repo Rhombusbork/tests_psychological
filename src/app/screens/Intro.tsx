@@ -26,7 +26,8 @@ export function Intro({ saved, onStart, onResume }: Props) {
         <h2 className="font-semibold">정확한 결과를 위해</h2>
         <ul className="mt-2 list-disc space-y-1 pl-5 text-stone-600 dark:text-stone-400">
           <li>되고 싶은 모습이 아니라 <b>평소 실제 모습</b>으로 답하세요.</li>
-          <li>최근 일시적인 상태보다 <b>오랫동안 반복된 패턴</b>을 떠올리세요.</li>
+          <li>최근 일시적인 상태보다 <b>오랫동안 반복된 패턴</b>을 떠올리세요. 직장과 사생활을 모두 아우른 모습을 기준으로 합니다.</li>
+          <li>마지막 단계의 일부 문항은 <b>최근 한 달</b>의 상태를 묻습니다. 화면에 따로 표시됩니다.</li>
           <li>너무 오래 고민하지 말고 처음 떠오르는 답을 고르세요.</li>
           <li>진행 상황은 이 브라우저에 자동 저장됩니다. 중간에 닫아도 이어서 할 수 있습니다.</li>
           <li>키보드: 숫자 키로 응답, Backspace로 이전 문항.</li>

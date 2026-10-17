@@ -72,6 +72,9 @@ export function Test({ session, onChange, onDone, onExit }: Props) {
       <div className="flex flex-1 flex-col justify-center py-10">
         {item.kind === 'likert' ? (
           <>
+            {item.block === 'level' && (
+              <p className="mb-4 text-center text-sm font-medium text-amber-700 dark:text-amber-400">최근 한 달 동안의 내 상태를 기준으로 답해 주세요</p>
+            )}
             <p className="text-center text-xl font-medium leading-relaxed sm:text-2xl">{item.text}</p>
             <div className="mt-10 grid grid-cols-5 gap-2">
               {LIKERT_LABELS.map((label, k) => (

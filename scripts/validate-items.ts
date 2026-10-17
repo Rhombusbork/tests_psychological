@@ -26,13 +26,44 @@ for (const t of texts.filter((t, i) => texts.indexOf(t) !== i)) errors.push(`리
 
 // 3. 길이 · 금지어 · 이중질문 패턴
 const BANNED = ['에니어그램', '날개', '격정', '고착', '본능', '유형'];
-const DOUBLE = [/그리고/, /또는/];
-const checkText = (id: string, t: string) => {
+/** 문항 품질 규칙 (docs/ITEM_DESIGN.md 3절) */
+const RULES: [RegExp, string][] = [
+  [/그리고|또는|거나|[,，·]/, '이중 질문 (개념 나열)'],
+  [/때가 있다|때도 있다|적이 있다|경우가 있다/, '빈도 하한 표현 (누구나 동의)'],
+  [/나도 모르게|무의식/, '자각 불가능한 내용을 물음'],
+  [/남들보다|남보다 더|다른 사람보다/, '타인 비교 요구'],
+];
+const checkText = (id: string, t: string, strict = true) => {
   if (t.length < 10 || t.length > 60) warnings.push(`${id}: 길이 ${t.length}자`);
   for (const w of BANNED) if (t.includes(w)) errors.push(`${id}: 금지어 "${w}"`);
-  for (const re of DOUBLE) if (re.test(t)) warnings.push(`${id}: 이중질문 의심 "${t}"`);
+  if (strict) for (const [re, why] of RULES) if (re.test(t)) errors.push(`${id}: ${why} "${t}"`);
 };
-for (const i of allLikertItems) if (i.validity !== 'attention') checkText(i.id, i.text);
+
+// 같은 유형·본능 안 문장 유사도 (글자 bigram Jaccard)
+const bigrams = (t: string) => {
+  const c = t.replace(/[\s.]/g, '');
+  return new Set(Array.from({ length: c.length - 1 }, (_, k) => c.slice(k, k + 2)));
+};
+const jaccard = (a: Set<string>, b: Set<string>) => [...a].filter((x) => b.has(x)).length / new Set([...a, ...b]).size;
+const SIM_MAX = 0.4;
+for (const i of allLikertItems) if (i.validity !== 'attention') checkText(i.id, i.text, i.validity !== 'desirability');
+
+const groups = new Map<string, typeof allLikertItems>();
+for (const i of allLikertItems) {
+  if (i.block !== 'core' && i.block !== 'instinct') continue;
+  const g = String(i.type ?? i.instinct);
+  groups.set(g, [...(groups.get(g) ?? []), i]);
+}
+for (const items of groups.values())
+  for (let x = 0; x < items.length; x++)
+    for (let y = x + 1; y < items.length; y++) {
+      const sim = jaccard(bigrams(items[x].text), bigrams(items[y].text));
+      if (sim > SIM_MAX) errors.push(`유사 문항 ${items[x].id} ↔ ${items[y].id} (${sim.toFixed(2)})`);
+    }
+
+// 강제선택 문장 재사용 금지
+const fcTexts = allForcedChoiceItems.flatMap((i) => [i.a.text, i.b.text]);
+for (const t of fcTexts.filter((t, k) => fcTexts.indexOf(t) !== k)) errors.push(`강제선택 문장 재사용: ${t}`);
 for (const i of allForcedChoiceItems) { checkText(`${i.id}A`, i.a.text); checkText(`${i.id}B`, i.b.text); }
 
 // 4. 강제선택: 36쌍 × 2, 선택지 길이 균형

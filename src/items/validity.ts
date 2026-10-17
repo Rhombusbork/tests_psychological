@@ -21,4 +21,8 @@ export const validityItems: readonly LikertItem[] = [
   { id: 'V-D2', block: 'validity', validity: 'desirability', key: 1, text: '나는 누구에게도 화를 낸 적이 없다.' },
   { id: 'V-D3', block: 'validity', validity: 'desirability', key: 1, text: '나는 어떤 사람이든 언제나 좋아한다.' },
   { id: 'V-D4', block: 'validity', validity: 'desirability', key: 1, text: '나는 약속을 어긴 적이 한 번도 없다.' },
+  { id: 'V-D5', block: 'validity', validity: 'desirability', key: 1, text: '나는 어떤 상황에서도 감정을 완벽하게 다스린다.' },
+  { id: 'V-D6', block: 'validity', validity: 'desirability', key: 1, text: '나는 남의 험담을 해 본 적이 없다.' },
+  { id: 'V-D7', block: 'validity', validity: 'desirability', key: 1, text: '나는 실수를 하면 언제나 그 자리에서 바로 인정한다.' },
+  { id: 'V-D8', block: 'validity', validity: 'desirability', key: 1, text: '나는 누구에게나 항상 똑같이 친절하다.' },
 ];
