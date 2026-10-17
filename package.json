@@ -1,0 +1,15 @@
+{
+  "name": "enneagram-test",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "validate": "tsx scripts/validate-items.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}
