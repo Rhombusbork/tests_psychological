@@ -9,12 +9,12 @@ export function Intro({ saved, onStart, onResume }: Props) {
       <p className="text-sm font-medium tracking-wide text-indigo-600 dark:text-indigo-400">ENNEAGRAM ASSESSMENT</p>
       <h1 className="mt-2 text-3xl font-bold sm:text-4xl">통합 에니어그램 검사</h1>
       <p className="mt-4 leading-relaxed text-stone-600 dark:text-stone-400">
-        행동이 아닌 <b>동기</b>를 측정해 9가지 유형 중 당신의 핵심 유형을 찾습니다. 응답에 따라 문항이 달라지는 적응형 검사로,
+        행동이 아닌 <b>동기</b>를 측정해 9가지 유형 중 당신의 핵심 유형을 찾습니다. 응답할 때마다 가장 헷갈리는 후보 유형을 가려낼 문항을 골라 내고, 충분히 확실해지면 일찍 끝나는 적응형 검사로,
         날개 · 본능 하위유형 · 트라이타입 · 센터 · 통합 수준까지 함께 분석합니다.
       </p>
 
       <dl className="mt-8 grid grid-cols-3 gap-3 text-center">
-        {[['약 320', '문항'], ['40–50분', '소요'], ['3단계', '적응형']].map(([v, l]) => (
+        {[['약 190–250', '문항'], ['25–35분', '소요'], ['조기 종료', '적응형']].map(([v, l]) => (
           <div key={l} className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-stone-200 dark:bg-stone-900 dark:ring-stone-800">
             <dt className="text-xl font-semibold">{v}</dt>
             <dd className="text-xs text-stone-500">{l}</dd>

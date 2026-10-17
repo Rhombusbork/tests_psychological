@@ -5,7 +5,7 @@ import { answer, back, expectedTotal, type Session } from '../../engine/session'
 
 interface Props { session: Session; onChange: (s: Session) => void; onDone: () => void; onExit: () => void }
 
-const PHASE_NAMES = { 1: '1단계 · 선별', 2: '2단계 · 변별', 3: '3단계 · 마무리', done: '완료' } as const;
+const PHASE_NAMES = { 1: '1단계 · 선별', 2: '2단계 · 정밀 측정', 3: '3단계 · 마무리', done: '완료' } as const;
 const MAX_MS = 10 * 60 * 1000;
 
 export function Test({ session, onChange, onDone, onExit }: Props) {

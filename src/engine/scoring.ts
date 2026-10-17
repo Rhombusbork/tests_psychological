@@ -1,5 +1,6 @@
 import { coreItems, fcInstinctItems, fcTypeItems, instinctItems, levelItems } from '../items/index';
 import { CENTERS, FACETS, type Center, type EnneaType, type ForcedChoiceItem, type Instinct, type LikertItem } from '../items/schema';
+import { posterior } from './bayes';
 import { CONFIG } from './config';
 
 export type Answers = Readonly<Record<string, number>>;
@@ -77,17 +78,16 @@ export function scoreTypes(a: Answers): TypeResult[] {
   const raw = new Map(TYPES.map((t) => [t, facetMean(coreItems.filter((i) => i.type === t), a)] as const));
   const fc = fcScores(fcTypeItems, a, (s) => s.type!);
   const scores = combine(TYPES, raw, fc);
-  const exps = TYPES.map((t) => Math.exp(scores.get(t)! / CONFIG.softmaxTau));
-  const z = exps.reduce((x, y) => x + y, 0);
+  const post = posterior(a);
   return TYPES.map((t, k) => ({
     type: t,
     raw: raw.get(t)!,
     score: scores.get(t)!,
-    probability: exps[k] / z,
+    probability: post[k],
     facets: Object.fromEntries(
       FACETS.map((f) => [f, mean(coreItems.filter((i) => i.type === t && i.facet === f).map((i) => scored(i, a)).filter((v): v is number => v !== undefined))]),
     ),
-  })).sort((x, y) => y.score - x.score);
+  })).sort((x, y) => y.probability - x.probability || y.score - x.score);
 }
 
 export const neighbors = (t: EnneaType): [EnneaType, EnneaType] => [(((t + 7) % 9) + 1) as EnneaType, ((t % 9) + 1) as EnneaType];

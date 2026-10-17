@@ -1,13 +1,20 @@
-import { coreItems, fcInstinctItems, fcTypeItems, instinctItems, levelItems, validityItems } from '../items/index';
+import { coreItems, fcInstinctItems, instinctItems, levelItems, validityItems } from '../items/index';
 import type { EnneaType, LikertItem } from '../items/schema';
 import { CONFIG } from './config';
 import { rng, shuffle } from './rng';
 
-/** 1단계: 핵심 + 본능 + 타당도(주의 문항 제외)를 제약 하에 섞고 주의 문항을 지정 구간에 삽입 */
+/** 1단계 선별 문항: 측면마다 정문항 1 + 역문항 1, 일관성 쌍 원문항은 강제 포함 */
+export function screeningItems(): LikertItem[] {
+  const paired = new Set(validityItems.map((v) => v.pairWith).filter(Boolean));
+  const pick = (i: LikertItem) => i.id.endsWith('-1') || i.key === -1 || paired.has(i.id);
+  return [...coreItems.filter(pick), ...instinctItems.filter(pick)];
+}
+
+/** 1단계: 선별 문항 + 타당도(주의 문항 제외)를 제약 하에 섞고 주의 문항을 지정 구간에 삽입 */
 export function buildPhase1(seed: number): string[] {
   const rand = rng(seed);
   const attention = validityItems.filter((i) => i.validity === 'attention');
-  const pool: LikertItem[] = [...coreItems, ...instinctItems, ...validityItems.filter((i) => i.validity !== 'attention')];
+  const pool: LikertItem[] = [...screeningItems(), ...validityItems.filter((i) => i.validity !== 'attention')];
   const pairOf = new Map(validityItems.filter((v) => v.pairWith).map((v) => [v.id, v.pairWith!] as const));
   for (const [v, c] of [...pairOf]) pairOf.set(c, v);
 
@@ -66,23 +73,14 @@ function violations(out: LikertItem[], pairOf: Map<string, string>): number {
   return v;
 }
 
-/** 2단계: 잠정 순위(내림차순 유형 배열)와 1·2위 점수 차로 변별 문항 선택 */
-export function buildPhase2(ranking: EnneaType[], gap: number, seed: number): string[] {
-  const rand = rng(seed + 1);
-  const top = ranking.slice(0, CONFIG.phase2TopN);
-  const pairs = new Set<string>();
-  for (let i = 0; i < top.length; i++) for (let j = i + 1; j < top.length; j++) pairs.add(key(top[i], top[j]));
-  if (gap < CONFIG.phase2CloseGap) {
-    for (const a of ranking.slice(0, 2)) for (const b of ranking.slice(4, 6)) pairs.add(key(a, b));
-  }
-  const types = fcTypeItems.filter((i) => pairs.has(key(i.a.type!, i.b.type!)));
-  return shuffle([...types, ...fcInstinctItems], rand).map((i) => i.id);
-}
-
-/** 3단계: 확정 1·2위 유형의 수준 문항 */
-export function buildPhase3(top2: EnneaType[], seed: number): string[] {
+/** 3단계 마무리: 본능 강제선택(쌍마다 2) + 1·2위 유형 수준 문항 */
+export function buildFinal(top2: EnneaType[], seed: number): string[] {
   const rand = rng(seed + 2);
-  return shuffle(levelItems.filter((i) => top2.includes(i.type!)), rand).map((i) => i.id);
+  const seen = new Map<string, number>();
+  const inst = fcInstinctItems.filter((i) => {
+    const k = `${i.a.instinct}-${i.b.instinct}`;
+    seen.set(k, (seen.get(k) ?? 0) + 1);
+    return seen.get(k)! <= 2;
+  });
+  return shuffle([...inst, ...levelItems.filter((i) => top2.includes(i.type!))], rand).map((i) => i.id);
 }
-
-const key = (a: number, b: number) => (a < b ? `${a}-${b}` : `${b}-${a}`);

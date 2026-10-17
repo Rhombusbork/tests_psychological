@@ -10,7 +10,9 @@ describe('order', () => {
   it('phase 1 contains every screening item exactly once and is seed-stable', () => {
     const a = buildPhase1(42);
     expect(new Set(a).size).toBe(a.length);
-    expect(a.length).toBe(278);
+    expect(a.length).toBe(buildPhase1(1).length);
+    expect(a.length).toBeGreaterThan(140);
+    expect(a.length).toBeLessThan(180);
     expect(buildPhase1(42)).toEqual(a);
     expect(buildPhase1(43)).not.toEqual(a);
   });
@@ -48,6 +50,12 @@ describe('scoring', () => {
 });
 
 describe('session', () => {
+  it('stops early for a clear responder', () => {
+    const s = runPersona(makePersona(3, 11), 11);
+    expect(s.queue.length).toBeLessThan(260);
+    expect(scoreAll(s.answers).confidence).toBeGreaterThan(0.9);
+  });
+
   it('runs through all three phases', () => {
     const s = runPersona(makePersona(6, 1), 1);
     expect(s.phase).toBe('done');

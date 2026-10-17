@@ -64,7 +64,7 @@ export function Result({ session, onRestart }: { session: Session; onRestart: ()
             ))}
           </div>
         </div>
-        <p className="mt-4 text-xs text-stone-500">점수는 0–100 상대 점수입니다. 내 응답 안에서 각 유형이 다른 유형보다 얼마나 두드러지는지를 나타냅니다.</p>
+        <p className="mt-4 text-xs text-stone-500">점수는 0–100 상대 점수로, 내 응답 안에서 각 유형이 얼마나 두드러지는지를 나타냅니다. 확신도는 모든 응답을 종합했을 때 주유형이 맞을 확률의 추정치입니다.</p>
       </Section>
 
       {showCandidates && (

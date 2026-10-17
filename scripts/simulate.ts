@@ -10,6 +10,7 @@ let instCorrect = 0;
 let total = 0;
 const confusion: Record<number, Record<number, number>> = {};
 const lengths: number[] = [];
+const calib: [number, boolean][] = [];
 
 for (const t of TYPES) {
   confusion[t] = {};
@@ -21,6 +22,7 @@ for (const t of TYPES) {
     lengths.push(s.queue.length);
     confusion[t][r.main] = (confusion[t][r.main] ?? 0) + 1;
     if (r.main === t) correct++;
+    calib.push([r.confidence, r.main === t]);
     if (r.stack[0] === p.instinct) instCorrect++;
     total++;
   }
@@ -43,7 +45,13 @@ console.log(`주유형 정확도        ${pct(correct, total)}  (${correct}/${to
 console.log(`1순위 본능 정확도    ${pct(instCorrect, total)}`);
 console.log(`무작위 응답 경고율   ${pct(cautioned, N)}`);
 console.log(`정상 응답 오경고율   ${pct(falseCaution, N)}`);
-console.log(`문항 수              ${Math.min(...lengths)}–${Math.max(...lengths)}`);
+console.log(`문항 수              ${Math.min(...lengths)}–${Math.max(...lengths)} (평균 ${(lengths.reduce((a, b) => a + b, 0) / lengths.length).toFixed(0)})`);
+const bins = [[0, 0.5], [0.5, 0.7], [0.7, 0.9], [0.9, 1.01]];
+console.log('\n확신도 보정 (표시 확신도 → 실제 적중률)');
+for (const [lo, hi] of bins) {
+  const g = calib.filter(([c]) => c >= lo && c < hi);
+  if (g.length) console.log(`  ${(lo * 100).toFixed(0)}–${Math.min(100, hi * 100).toFixed(0)}%: ${g.length}명, 적중 ${pct(g.filter(([, ok]) => ok).length, g.length)}`);
+}
 console.log('\n혼동 행렬 (행 = 실제, 열 = 판정)');
 console.log('     ' + TYPES.map((t) => String(t).padStart(4)).join(''));
 for (const t of TYPES) console.log(`  ${t}  ` + TYPES.map((u) => String(confusion[t][u] ?? 0).padStart(4)).join(''));
