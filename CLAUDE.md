@@ -114,6 +114,7 @@ scripts/             검증·시뮬레이션
 
 ## 9. 알려진 이슈
 
-- `neojun6007` 계정의 저장소 초대가 수락 대기 중이다. https://github.com/Rhombusbork/tests_psychological/invitations 에서 수락해야 push할 수 있다.
+- push는 SSH 원격(`git@github.com:Rhombusbork/tests_psychological.git`)으로 한다. gh의 fine-grained 토큰은 이 저장소 권한이 없다.
+- Pages 활성화(Settings → Pages → Source: GitHub Actions)는 저장소 admin(Rhombusbork)만 할 수 있다. 활성화 전에는 deploy 잡이 실패한다.
 - 개발 환경(WSL)에 Chromium 시스템 라이브러리가 없어 브라우저 E2E 테스트를 할 수 없다. 화면 검증은 `render.test.tsx`(서버 렌더)로 대신한다.
 - GitHub Pages를 쓰려면 저장소 Settings → Pages에서 Source를 "GitHub Actions"로 바꿔야 한다(8단계).
