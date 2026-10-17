@@ -63,7 +63,7 @@ iEQ9 수준의 전문적이고 신뢰성 높은 에니어그램 검사 웹앱.
 | 5 | 시뮬레이션 검증 | `scripts/simulate.ts` | 표준 조건 정확도 ≥ 90%, 어려운 조건 ≥ 75%, 무작위 응답자 경고율 ≥ 80% | 통과 (조기 종료 버전: 100% / 90% / 98%, 평균 192문항) |
 | 6 | UI·보고서 설계 | `docs/UI_DESIGN.md` | 화면 흐름, 와이어프레임, 보고서 섹션 구성 승인 | 작성됨 (검토 대기) |
 | 7 | UI·보고서 구현 | `src/app/` | 모바일·데스크톱 동작, 이어하기, 인쇄 보고서 | 구현됨 (실기기 확인 필요) |
-| 8 | 배포 | `.github/workflows/deploy.yml` | Pages URL에서 처음부터 끝까지 검사 완료 확인 | 워크플로 작성됨, 첫 배포 전 |
+| 8 | 배포 | `.github/workflows/deploy.yml` | Pages URL에서 처음부터 끝까지 검사 완료 확인 | 배포 완료 (2026-10-18). 실기기 응시 확인 대기 |
 
 단계를 마칠 때마다 이 표의 상태를 갱신한다.
 
@@ -115,6 +115,6 @@ scripts/             검증·시뮬레이션
 ## 9. 알려진 이슈
 
 - push는 SSH 원격(`git@github.com:Rhombusbork/tests_psychological.git`)으로 한다. gh의 fine-grained 토큰은 이 저장소 권한이 없다.
-- Pages 활성화(Settings → Pages → Source: GitHub Actions)는 저장소 admin(Rhombusbork)만 할 수 있다. 활성화 전에는 deploy 잡이 실패한다.
+- Pages는 GitHub Actions 방식으로 설정되어 있다. `main`에 push하면 자동으로 배포된다.
 - 개발 환경(WSL)에 Chromium 시스템 라이브러리가 없어 브라우저 E2E 테스트를 할 수 없다. 화면 검증은 `render.test.tsx`(서버 렌더)로 대신한다.
 - GitHub Pages를 쓰려면 저장소 Settings → Pages에서 Source를 "GitHub Actions"로 바꿔야 한다(8단계).
