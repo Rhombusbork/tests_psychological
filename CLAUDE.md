@@ -55,15 +55,15 @@ iEQ9 수준의 전문적이고 신뢰성 높은 에니어그램 검사 웹앱.
 
 | # | 단계 | 산출물 | 완료 기준 | 상태 |
 |---|---|---|---|---|
-| 0 | 프로젝트 규칙 | `CLAUDE.md` | 사용자 승인 | 검토 중 |
-| 1 | 문항 설계 명세 | `docs/ITEM_DESIGN.md` | 측정 구조, 측면 정의, 작성 규칙, 채점식 승인 | 초안 |
-| 2 | 문항 작성 | `src/items/` | 명세 대비 검토 완료, `npm run validate` 통과, 사용자 문항 검토 | **초안 v0 존재** (1단계 확정 후 검토·수정) |
-| 3 | 엔진 설계 | `docs/ENGINE_DESIGN.md` | 채점, 적응형 규칙, 확신도, 타당도 계산 방식 승인 | 미착수 |
-| 4 | 엔진 구현 | `src/engine/` + 테스트 | 단위 테스트 통과 | 미착수 |
-| 5 | 시뮬레이션 검증 | `scripts/simulate.ts` | 유형별 가상 응답자의 판정 정확도 ≥ 90%, 노이즈 응답에서 타당도 경고 발생 | 미착수 |
-| 6 | UI·보고서 설계 | `docs/UI_DESIGN.md` | 화면 흐름, 와이어프레임, 보고서 섹션 구성 승인 | 미착수 |
-| 7 | UI·보고서 구현 | `src/app/` | 모바일·데스크톱 동작, 이어하기, 인쇄 보고서 | 미착수 |
-| 8 | 배포 | `.github/workflows/deploy.yml` | Pages URL에서 처음부터 끝까지 검사 완료 확인 | 미착수 |
+| 0 | 프로젝트 규칙 | `CLAUDE.md` | 사용자 승인 | 완료 |
+| 1 | 문항 설계 명세 | `docs/ITEM_DESIGN.md` | 측정 구조, 측면 정의, 작성 규칙, 채점식 승인 | 초안 (사용자 검토 대기) |
+| 2 | 문항 작성 | `src/items/` | 명세 대비 검토 완료, `npm run validate` 통과, 사용자 문항 검토 | v0.1.0 (사용자 문항 검토 대기) |
+| 3 | 엔진 설계 | `docs/ENGINE_DESIGN.md` | 채점, 적응형 규칙, 확신도, 타당도 계산 방식 승인 | 작성됨 (검토 대기) |
+| 4 | 엔진 구현 | `src/engine/` + 테스트 | 단위 테스트 통과 | 구현됨 |
+| 5 | 시뮬레이션 검증 | `scripts/simulate.ts` | 표준 조건 정확도 ≥ 90%, 어려운 조건 ≥ 75%, 무작위 응답자 경고율 ≥ 80% | 통과 (100% / 89% / 99%) |
+| 6 | UI·보고서 설계 | `docs/UI_DESIGN.md` | 화면 흐름, 와이어프레임, 보고서 섹션 구성 승인 | 작성됨 (검토 대기) |
+| 7 | UI·보고서 구현 | `src/app/` | 모바일·데스크톱 동작, 이어하기, 인쇄 보고서 | 구현됨 (실기기 확인 필요) |
+| 8 | 배포 | `.github/workflows/deploy.yml` | Pages URL에서 처음부터 끝까지 검사 완료 확인 | 워크플로 작성됨, 첫 배포 전 |
 
 단계를 마칠 때마다 이 표의 상태를 갱신한다.
 
@@ -107,12 +107,13 @@ scripts/             검증·시뮬레이션
 |---|---|---|
 | `npm run validate` | 문항 은행 구조·품질 검증 | 있음 |
 | `npm run typecheck` | 타입 검사 | 있음 |
-| `npm run dev` | 로컬 개발 서버 | 7단계 |
-| `npm test` | 엔진 단위 테스트 | 4단계 |
-| `npm run simulate` | 가상 응답자 판정 정확도 | 5단계 |
-| `npm run build` | Pages용 정적 빌드 (`dist/`) | 7단계 |
+| `npm run dev` | 로컬 개발 서버 | 있음 |
+| `npm test` | 엔진·화면 렌더 테스트 | 있음 |
+| `npm run simulate [N] [standard\|hard]` | 가상 응답자 판정 정확도 | 있음 |
+| `npm run build` | Pages용 정적 빌드 (`dist/`) | 있음 |
 
 ## 9. 알려진 이슈
 
-- 로컬 gh 계정 `neojun6007`에 `Rhombusbork/tests_psychological` 쓰기 권한이 없어 push가 실패한다(403). Collaborator로 초대하거나 해당 계정으로 `gh auth login`을 해야 한다.
+- `neojun6007` 계정의 저장소 초대가 수락 대기 중이다. https://github.com/Rhombusbork/tests_psychological/invitations 에서 수락해야 push할 수 있다.
+- 개발 환경(WSL)에 Chromium 시스템 라이브러리가 없어 브라우저 E2E 테스트를 할 수 없다. 화면 검증은 `render.test.tsx`(서버 렌더)로 대신한다.
 - GitHub Pages를 쓰려면 저장소 Settings → Pages에서 Source를 "GitHub Actions"로 바꿔야 한다(8단계).

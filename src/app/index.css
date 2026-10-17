@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: light dark; }
+body { @apply bg-stone-50 text-stone-900 dark:bg-stone-950 dark:text-stone-100 antialiased; }
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: white; color: black; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  section { break-inside: avoid; }
+}

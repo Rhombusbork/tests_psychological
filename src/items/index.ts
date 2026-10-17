@@ -63,3 +63,10 @@ export const fcInstinctItems: ForcedChoiceItem[] = instinctPairsAll;
 
 export const allLikertItems: LikertItem[] = [...coreItems, ...levelItems, ...instinctItems, ...validityItems];
 export const allForcedChoiceItems: ForcedChoiceItem[] = [...fcTypeItems, ...fcInstinctItems];
+
+export type AnyItem = ({ kind: 'likert' } & LikertItem) | ({ kind: 'fc' } & ForcedChoiceItem);
+
+export const itemById: ReadonlyMap<string, AnyItem> = new Map<string, AnyItem>([
+  ...allLikertItems.map((i) => [i.id, { kind: 'likert' as const, ...i }] as const),
+  ...allForcedChoiceItems.map((i) => [i.id, { kind: 'fc' as const, ...i }] as const),
+]);
